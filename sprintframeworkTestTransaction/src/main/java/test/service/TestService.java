@@ -18,24 +18,30 @@ public class TestService {
 	/**
 	 * インサート処理
 	 */
-	public void txInsert() {
-		this.execute();
+	public int txInsert(boolean doThrowException) {
+		return this.execute(doThrowException);
 	}
 	
 	/**
 	 * インサート処理実行
 	 */
-	public void execute() {
-		this.testDao.insertTest("name : " + new Date().getTime());
+	private int execute(boolean doThrowException) {
+		int result = this.testDao.insertTest("name : " + new Date().getTime());
 		
+		if (doThrowException) {
+			// ロールバック確認用
+			throw new RuntimeException();
+		}
 		// インサート結果表示
 		this.printResult();
+		
+		return result;
 	}
 	
 	/**
 	 * インサート結果表示
 	 */
-	public void printResult() {
+	private void printResult() {
 		List<TestDto> list = this.testDao.getTest();
 		if (!list.isEmpty()) {
 			for (TestDto dto : list) {

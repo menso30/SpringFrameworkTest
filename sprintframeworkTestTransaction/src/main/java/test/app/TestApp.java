@@ -23,6 +23,6 @@ public class TestApp {
 		ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
 
 		TestService service = (TestService) context.getBean(TestService.class);
-		service.txInsert();
+		service.txInsert(false);
 	}
 }
