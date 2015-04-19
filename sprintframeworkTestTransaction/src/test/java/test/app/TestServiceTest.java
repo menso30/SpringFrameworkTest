@@ -1,27 +1,36 @@
 package test.app;
 
-import static org.junit.Assert.assertEquals;
+import javax.annotation.Resource;
+import javax.sql.DataSource;
 
+import org.dbunit.DataSourceBasedDBTestCase;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.operation.DatabaseOperation;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import test.dao.TestDao;
 import test.service.TestService;
 
-public class TestServiceTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations="/applicationContext.xml")
+public class TestServiceTest extends DataSourceBasedDBTestCase  {
 	
+	@Resource
+	private DataSource dataSource;
+	
+	@Resource
 	private TestService testSevice;
 	
+	@Resource
 	private TestDao testDao;
 	
-	@SuppressWarnings("resource")
 	@Before
-	public void setUp() {
-		ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-		this.testSevice = (TestService) context.getBean(TestService.class);
-		this.testDao = (TestDao) context.getBean(TestDao.class);
+	public void setUp() throws Exception {
+		DatabaseOperation.TRUNCATE_TABLE.execute(this.getConnection(), this.getConnection().createDataSet());
 	}
 	/**
 	 * 正常処理
@@ -63,5 +72,13 @@ public class TestServiceTest {
 	
 	private void log(Object args) {
 		System.out.println(args);
+	}
+	@Override
+	protected DataSource getDataSource() {
+		return this.dataSource;
+	}
+	@Override
+	protected IDataSet getDataSet() throws Exception {
+		return this.getConnection().createDataSet();
 	}
 }
